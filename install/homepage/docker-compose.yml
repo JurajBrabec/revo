@@ -1,0 +1,22 @@
+services:
+  homepage:
+    container_name: homepage
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    expose:
+      - 3000
+    image: ghcr.io/benphelps/homepage:latest
+    labels:
+      - 'traefik.enable=true'
+      #      - 'traefik.http.routers.homepage.middlewares=login@docker'
+      - 'traefik.http.routers.homepage.rule=Host(`homepage.${DOMAIN}`)'
+      - 'traefik.http.routers.homepage.tls=true'
+    networks:
+      - default
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/config/homepage:/app/config'
+      - '${DOCKER_SOCKET}:/var/run/docker.sock:ro'

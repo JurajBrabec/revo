@@ -1,0 +1,20 @@
+{
+  "name": "revo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "restore snapshot": "start /b \"Restore\" \"C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage.exe\" snapshot revo restore \"Clean state\" ",
+    "start VM": "start /b \"Start VM\" \"C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage.exe\" startvm revo --type headless",
+    "copy source": "scp -r install revo@localhost:~/revo/",
+    "Start Chrome": "p:\\PortableApps\\GoogleChromePortable\\App\\chrome-bin\\chrome --remote-debugging-port=9222 --incognito",
+    "Test": "node test/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer-core": "^19.3.0"
+  }
+}

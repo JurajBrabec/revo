@@ -1,0 +1,37 @@
+services:
+  pihole:
+    cap_add:
+      - NET_ADMIN
+    container_name: pihole
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+      - PIHOLE_DNS1=${PIHOLE_DNS1}
+      - DNSMASQ_LISTENING=local
+      - WEBPASSWORD=${BASICAUTH_PASSWORD}
+    expose:
+      - 80
+    hostname: pihole
+    image: pihole/pihole:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.middlewares.adminPrefix.chain.middlewares=stripAdminPrefix,addAdminPrefix'
+      - 'traefik.http.middlewares.stripAdminPrefix.stripPrefix.prefixes=/admin'
+      - 'traefik.http.middlewares.addAdminPrefix.addPrefix.prefix=/admin'
+      - 'traefik.http.routers.pihole.middlewares=adminPrefix'
+      - 'traefik.http.routers.pihole.rule=Host(`pihole.${DOMAIN}`)'
+      - 'traefik.http.routers.pihole.service=pihole'
+      - 'traefik.http.routers.pihole.tls=true'
+      - 'traefik.http.services.pihole.loadbalancer.server.port=80'
+    networks:
+      - default
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+      - 67:67/udp
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/config/pihole/dnsmasq.d:/etc/dnsmasq.d'
+      - '${PROJECT_ROOT}/config/pihole/pihole:/etc/pihole'

@@ -1,0 +1,27 @@
+services:
+  portainer:
+    command: -H unix:///var/run/docker.sock --admin-password '${BASICAUTH_HASH}'
+    container_name: portainer
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    expose:
+      - 9000
+    image: portainer/portainer-ce:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)'
+      - 'traefik.http.routers.portainer.service=portainer'
+      - 'traefik.http.routers.portainer.tls=true'
+      - 'traefik.http.services.portainer.loadbalancer.server.port=9000'
+    networks:
+      - default
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - '${PROJECT_ROOT}/data/portainer:/data'
+      - '${DOCKER_SOCKET}:/var/run/docker.sock:ro'

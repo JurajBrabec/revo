@@ -1,0 +1,30 @@
+services:
+  traefik:
+    container_name: traefik
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    image: traefik:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.middlewares.login.basicauth.users=${BASICAUTH_USERNAME}:${BASICAUTH_HASH}'
+      - 'traefik.http.routers.api.rule=Host(`traefik.${DOMAIN}`) && PathPrefix(`/api`)'
+      - 'traefik.http.routers.api.service=api@internal'
+      - 'traefik.http.routers.api.tls=true'
+      - 'traefik.http.services.api.loadbalancer.server.port=80'
+      - 'traefik.http.routers.dashboard.middlewares=login'
+      - 'traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN}`)'
+      - 'traefik.http.routers.dashboard.service=dashboard@internal'
+      - 'traefik.http.routers.dashboard.tls=true'
+      - 'traefik.http.services.dashboard.loadbalancer.server.port=80'
+    networks:
+      - default
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/config/traefik:/etc/traefik'
+      - '${DOCKER_SOCKET}:/var/run/docker.sock:ro'

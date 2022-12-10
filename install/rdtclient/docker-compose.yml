@@ -1,0 +1,26 @@
+services:
+  rdtclient:
+    container_name: rdtclient
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    expose:
+      - 6500
+    image: rogerfar/rdtclient
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.rdtclient.rule=Host(`rdtclient.${DOMAIN}`)'
+      - 'traefik.http.routers.rdtclient.tls=true'
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    networks:
+      - default
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/data/rdtclient:/data/db'
+      - '${PROJECT_ROOT}/data/downloads:/data/downloads'
+      - '${PROJECT_ROOT}/data/tmp:/data/tmp'
