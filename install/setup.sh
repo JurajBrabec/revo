@@ -1,9 +1,6 @@
 #!/bin/bash
-OPTIONAL_SERVICES='bazarr jackett lidarr lldap pihole portainer prowlarr radarr rdtclient sonarr syncthing uptime watchtower whisparr homepage'
-SERVICES="traefik"
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-env_file=${SCRIPT_DIR}/.env
 log_file=${SCRIPT_DIR}/log/setup.log
 
 mkdir -p ${SCRIPT_DIR}/log
@@ -13,18 +10,9 @@ if ! id -Gn | grep '\bdocker\b' > /dev/null; then
     exit
 fi
 
+source ${SCRIPT_DIR}/env.sh
+
 echo -e "\nService Setup\n" | tee $log_file
-
-set -a; source $env_file; set +a
-
-IP_ADDRESS=$(hostname -I | cut -d \  -f 1)
-
-for service in ${OPTIONAL_SERVICES}; do
-  IS_ENABLED=${service^^}_ENABLED
-  if [ ! -z ${!IS_ENABLED} ]; then
-    SERVICES="${SERVICES} $service"
-  fi
-done
 
 mkdir -p ${PROJECT_ROOT}/config
 mkdir -p ${PROJECT_ROOT}/data/downloads
@@ -47,8 +35,8 @@ for service in ${SERVICES}; do
   if [ -f ${PROJECT_ROOT}/install/$service/install.sh ]; then
     echo -e "Installing service '$service' ..." | tee -a $log_file
     cd ${PROJECT_ROOT}/install/$service
-    . ${PROJECT_ROOT}/install/$service/install.sh
-    docker compose --env-file $env_file convert | grep "^services:" -A 999 | grep "networks:" -B 999 | grep -Ev "^(networks|services):" >> $docker_compose
+    source ${PROJECT_ROOT}/install/$service/install.sh
+    docker compose --env-file $ENV_FILE convert | grep "^services:" -A 999 | grep "networks:" -B 999 | grep -Ev "^(networks|services):" >> $docker_compose
   fi
 done
 
@@ -77,13 +65,11 @@ else
 fi
 
 #post configuration
-echo -e "\nChecking accessibility ..." | tee -a $log_file
-sleep 10
 
 for service in ${SERVICES}; do
   if [ -f ${PROJECT_ROOT}/install/$service/setup.sh ]; then
     echo -e "\nSetting up service '$service' ..." | tee -a $log_file
-    . ${PROJECT_ROOT}/install/$service/setup.sh
+    source ${PROJECT_ROOT}/install/$service/setup.sh
   fi
 done
 

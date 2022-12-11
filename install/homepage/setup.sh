@@ -22,4 +22,4 @@ for service in ${OPTIONAL_SERVICES}; do
 done
 sed -i '/#/d' $conf/services.yaml
 
-  echo -e "Success." | tee -a $log_file
+echo -e "Success." | tee -a $log_file

@@ -1,19 +1,17 @@
 #!/bin/bash
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-env_file=${SCRIPT_DIR}/.env
 log_file=${SCRIPT_DIR}/log/install.log
+mkdir -p ${SCRIPT_DIR}/log
 
 #if [[ $(/usr/bin/id -u) -ne 0 ]]; then
 #    echo -e "Not running as root." | tee -a $log_file
 #    exit
 #fi
 
-mkdir -p ${SCRIPT_DIR}/log
+source ${SCRIPT_DIR}/env.sh
 
 echo -e "\nSystem Installation\n" | tee $log_file
-
-set -a; source $env_file; set +a
 
 chmod +x ${SCRIPT_DIR}/*.sh
 

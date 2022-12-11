@@ -5,7 +5,7 @@ if [ ! -d ${PROJECT_ROOT}/data ]; then
   exit
 fi
 
-source ${PROJECT_ROOT}/install/api.sh
+source ${SCRIPT_DIR}/api.sh
 
 if [ -n "${RDTCLIENT_REALDEBRID_TOKEN}" ]; then
   name=RealDebrid
@@ -21,21 +21,24 @@ fi
 
 api_open "rdtclient.${DOMAIN}"
 
-response=$(api 'GET' '/Api/Authentication/IsLoggedIn')
-if  echo $response | grep "Setup required" > /dev/null; then
+response=$(api_call 'GET' '/Api/Authentication/IsLoggedIn')
+if echo $response | grep "Setup required" > /dev/null; then
   echo -e "Setting up '${BASICAUTH_USERNAME}' user..." | tee -a $log_file
-  response=$(api 'POST' '/Api/Authentication/Create' \
+  response=$(api_call 'POST' '/Api/Authentication/Create' \
     '{"userName": "'${BASICAUTH_USERNAME}'","password": "'${BASICAUTH_PASSWORD}'"}')
   if [ $? != 200 ]; then
-    echo -e "!!! ERROR" | tee -a $log_file
+    echo -e "!!! ERROR $?" | tee -a $log_file
+    api_clean
+    return
   fi
-
   if [ -n "$RDTCLIENT_PROVIDER" ]; then
     echo -e "Setting up '${name}' provider..." | tee -a $log_file
-    response=$(api 'POST' '/Api/Authentication/SetupProvider' \
+    response=$(api_call 'POST' '/Api/Authentication/SetupProvider' \
       '{"provider": "'${RDTCLIENT_PROVIDER}'","token": "'${RDTCLIENT_TOKEN}'"}')
     if [ $? != 200 ]; then
-      echo -e "!!! ERROR" | tee -a $log_file
+      echo -e "!!! ERROR $?" | tee -a $log_file
+      api_clean
+      return
     fi
   else
     echo -e "No provider selected." | tee -a $log_file
@@ -45,18 +48,23 @@ else
 fi
 
 echo -e "Logging in as '${BASICAUTH_USERNAME}'..." | tee -a $log_file
-response=$(api 'POST' '/Api/Authentication/Login' \
+response=$(api_call 'POST' '/Api/Authentication/Login' \
   '{"userName": "'${BASICAUTH_USERNAME}'","password": "'${BASICAUTH_PASSWORD}'"}')
 if [ $? != 200 ]; then
-  echo -e "!!! ERROR" | tee -a $log_file
+  echo -e "!!! ERROR $?" | tee -a $log_file
+  api_clean
+  return
 fi
 
-echo -e "Setting up settings..." | tee -a $log_file
-response=$(api 'PUT' '/Api/Settings' \
+echo -e "Modifying configuration..." | tee -a $log_file
+response=$(api_call 'PUT' '/Api/Settings' \
   '[{"key": "DownloadClient:MappedPath","value": "/downloads","type": "String"}]')
 if [ $? != 200 ]; then
-  echo -e "!!! ERROR" | tee -a $log_file
+  echo -e "!!! ERROR $?" | tee -a $log_file
+  api_clean
+  return
 fi
+
 echo -e "Success." | tee -a $log_file
 
 api_clean

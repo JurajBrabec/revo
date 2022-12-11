@@ -43,13 +43,6 @@
           type: watchtower
           url: http://watchtower:8080
           key: ${WATCHTOWER_API_TOKEN}
-    #uptime
-    - Uptime Kuma:
-        icon: uptime-kuma.png
-        href: https://uptime.${DOMAIN}
-        description: Uptime Kuma
-        server: docker
-        container: uptime-kuma
 - Multimedia:
     #radarr
     - Radarr:
@@ -132,10 +125,3 @@
         description: RDT Client
         server: docker
         container: rdtclient
-    #syncthing
-    - SyncThing:
-        icon: syncthing.png
-        href: https://syncthing.${DOMAIN}
-        description: SyncThing
-        server: docker
-        container: syncthing

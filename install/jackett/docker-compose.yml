@@ -1,0 +1,22 @@
+services:
+  jackett:
+    container_name: jackett
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+      - AUTO_UPDATE=false
+    expose:
+      - 9117
+    image: lscr.io/linuxserver/jackett:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.jackett.rule=Host(`jackett.${DOMAIN}`)'
+      - 'traefik.http.routers.jackett.tls=true'
+    networks:
+      - default
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/config/jackett:/config/Jackett'
+      - '${PROJECT_ROOT}/data/downloads:/downloads'
