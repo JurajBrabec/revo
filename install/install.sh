@@ -9,8 +9,6 @@ mkdir -p ${SCRIPT_DIR}/log
 #    exit
 #fi
 
-source ${SCRIPT_DIR}/env.sh
-
 echo -e "\nSystem Installation\n" | tee $log_file
 
 chmod +x ${SCRIPT_DIR}/*.sh
@@ -23,7 +21,9 @@ sudo apt upgrade -y >>$log_file 2>&1
 echo -e "Installing dependencies..." | tee -a $log_file
 sudo apt install -y apache2-utils apt-transport-https ca-certificates curl software-properties-common >>$log_file 2>&1
 
-echo -e "Installing 'docker'..." | tee -a $log_file
+latest_version="$(curl -s https://api.github.com/repos/docker/cli/tags | grep "name" | grep -v -m 1 "beta" | cut -d \" -f 4)"
+
+echo -e "Installing 'docker' ${latest_version}..." | tee -a $log_file
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - >>$log_file 2>&1
 sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" >>$log_file 2>&1
 sudo apt install -y docker-ce >>$log_file 2>&1
@@ -51,3 +51,5 @@ echo -e "UID / GID :" $(id | cut -d " "  -f 1,2) | tee -a $log_file
 
 echo -e "\nDone." | tee -a $log_file
 echo -e "\nReboot now and continue with setup.\n" | tee -a $log_file
+
+sudo reboot now

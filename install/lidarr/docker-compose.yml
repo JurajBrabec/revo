@@ -1,0 +1,22 @@
+services:
+  lidarr:
+    container_name: lidarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    expose:
+      - 8686
+    image: lscr.io/linuxserver/lidarr:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.lidarr.rule=Host(`lidarr.${DOMAIN}`)'
+      - 'traefik.http.routers.lidarr.tls=true'
+    networks:
+      - default
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/config/lidarr:/config'
+      - '${PROJECT_ROOT}/data/downloads:/downloads'
+      - '${PROJECT_ROOT}/data/share/music:/music'

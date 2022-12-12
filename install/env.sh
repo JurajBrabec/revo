@@ -3,9 +3,6 @@ OPTIONAL_SERVICES='pihole portainer rdtclient jackett radarr sonarr lidarr whisp
 
 ENV_FILE=${SCRIPT_DIR}/.env
 
-export BASICAUTH_HASH=$(htpasswd -nbB "${BASICAUTH_USERNAME}" "${BASICAUTH_PASSWORD}" | cut -d : -f 2)
-export IP_ADDRESS=$(hostname -I | cut -d \  -f 1)
-
 set_env () {
   if [ -n "$1" ]; then
     export $1=$2
@@ -15,6 +12,9 @@ set_env () {
 }
 
 set_env
+
+export BASICAUTH_HASH=$(htpasswd -nbB "${BASICAUTH_USERNAME}" "${BASICAUTH_PASSWORD}" | cut -d : -f 2)
+export IP_ADDRESS=$(hostname -I | cut -d \  -f 1)
 
 for service in ${OPTIONAL_SERVICES}; do
   IS_ENABLED=${service^^}_ENABLED
