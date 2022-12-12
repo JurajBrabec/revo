@@ -7,7 +7,7 @@ fi
 
 source ${SCRIPT_DIR}/api.sh
 
-api_open "radarr.${DOMAIN}"
+api_open "sonarr.${DOMAIN}"
 
 echo -e "Retrieving API key..." | tee -a $log_file
 response=$(api_call 'GET' '/initialize.js')
@@ -18,12 +18,13 @@ if [ $? != 200 ]; then
 fi
 api_root=$(echo $response | cut -d \' -f2)
 api_key=$(echo $response | cut -d \' -f4)
-set_env 'RADARR_API_KEY' "$api_key"
+set_env 'SONARR_API_KEY' "$api_key"
 api_token "x-api-key: $api_key"
+echo API KEY: $api_key
 
 echo -e "Adding root folder..." | tee -a $log_file
 
-response=$(api_call 'POST' "$api_root/rootFolder" '{"path":"/movies"}')
+response=$(api_call 'POST' "$api_root/rootFolder" '{"path":"/tv"}')
 if [ $? != 201 ]; then
   echo -e "!!! ERROR $?" | tee -a $log_file
   api_clean
@@ -47,7 +48,7 @@ for schema in "${schemas[@]}"; do
     fields=$(echo $fields | jq 'map(select(.name=="port").value=6500)')
     fields=$(echo $fields | jq 'map(select(.name=="username").value="'${BASICAUTH_USERNAME}'")')
     fields=$(echo $fields | jq 'map(select(.name=="password").value="'${BASICAUTH_PASSWORD}'")')
-    fields=$(echo $fields | jq 'map(select(.name=="movieCategory").value="radarr")')
+    fields=$(echo $fields | jq 'map(select(.name=="tvCategory").value="sonarr")')
     payload=$(echo $schema | jq '.enable=true|.name="RDTClient"|.fields='"$fields")
     response=$(api_call 'POST' "$route?" "$payload")
     if [ $? != 201 ]; then
@@ -73,7 +74,7 @@ readarray -t schemas < <(echo $response | jq -c '.[]')
 for schema in "${schemas[@]}"; do
   if echo $schema | jq -j '.implementation' | grep -qi $provider; then
     fields=$(echo $schema | jq -j '.fields' | jq 'map(select(.name=="apiKey").value="'$token'")')
-    payload=$(echo $schema | jq '.onGrab=true|.onDownload=true|.onUpgrade=true|.onRename=true|.onMovieAdded=true|.onMovieDelete=true|.onMovieFileDelete=true|.onMovieFileDeleteForUpgrade=true|.onHealthIssue=true|.onApplicationUpdate=true|.includeHealthWarnings=true|.name="Pushbullet"|.fields='"$fields")
+    payload=$(echo $schema | jq '.onGrab=true|.onDownload=true|.onUpgrade=true|.onRename=true|.onSeriesDelete=true|.onEpisodeFileDelete=true|.onEpisodeFileDeleteForUpgrade=true|.onHealthIssue=true|.onApplicationUpdate=true|.includeHealthWarnings=true|.name="Pushbullet"|.fields='"$fields")
     response=$(api_call 'POST' "$route?" "$payload")
     if [ $? != 201 ]; then
       echo -e "!!! ERROR $?" | tee -a $log_file
