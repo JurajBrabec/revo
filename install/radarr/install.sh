@@ -5,5 +5,6 @@ if [ ! -d ${PROJECT_ROOT}/config ]; then
   exit
 fi
 
-mkdir -p ${PROJECT_ROOT}/conf/radarr
+mkdir -p ${PROJECT_ROOT}/config/radarr
 mkdir -p ${PROJECT_ROOT}/data/downloads/radarr
+mkdir -p ${PROJECT_ROOT}/data/share/movies

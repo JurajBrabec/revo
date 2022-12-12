@@ -1,0 +1,22 @@
+services:
+  whisparr:
+    container_name: whisparr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    expose:
+      - 6969
+    image: cr.hotio.dev/hotio/whisparr:nightly
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.whisparr.rule=Host(`whisparr.${DOMAIN}`)'
+      - 'traefik.http.routers.whisparr.tls=true'
+    networks:
+      - default
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/config/whisparr:/config'
+      - '${PROJECT_ROOT}/data/downloads:/downloads'
+      - '${PROJECT_ROOT}/data/share/xxx:/xxx'

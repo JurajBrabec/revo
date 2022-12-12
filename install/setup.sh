@@ -16,10 +16,6 @@ echo -e "\nService Setup\n" | tee $log_file
 
 mkdir -p ${PROJECT_ROOT}/config
 mkdir -p ${PROJECT_ROOT}/data/downloads
-mkdir -p ${PROJECT_ROOT}/data/share/movies
-mkdir -p ${PROJECT_ROOT}/data/share/music
-mkdir -p ${PROJECT_ROOT}/data/share/tv
-mkdir -p ${PROJECT_ROOT}/data/share/xxx
 mkdir -p ${PROJECT_ROOT}/data/tmp
 
 #create-docker-compose
@@ -52,7 +48,7 @@ cd ${PROJECT_ROOT}
 #start-docker
 
 echo -e "\nPulling images ..." | tee -a $log_file
-docker compose pull
+docker compose pull -q
 
 if ! docker network ls | grep -q ${DOCKER_NETWORK}; then
   echo -e "\nCreating network '${DOCKER_NETWORK}'..." | tee -a $log_file
@@ -65,6 +61,7 @@ else
 fi
 
 #post configuration
+echo -e "\nSetting up services ..." | tee -a $log_file
 
 for service in ${SERVICES}; do
   if [ -f ${PROJECT_ROOT}/install/$service/setup.sh ]; then

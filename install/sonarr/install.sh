@@ -5,5 +5,6 @@ if [ ! -d ${PROJECT_ROOT}/config ]; then
   exit
 fi
 
-mkdir -p ${PROJECT_ROOT}/conf/sonarr
+mkdir -p ${PROJECT_ROOT}/config/sonarr
 mkdir -p ${PROJECT_ROOT}/data/downloads/sonarr
+mkdir -p ${PROJECT_ROOT}/data/share/tv

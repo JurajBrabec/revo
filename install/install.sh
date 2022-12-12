@@ -50,6 +50,6 @@ echo -e "\nIP address:" $(hostname -I | cut -d \  -f 1) | tee -a $log_file
 echo -e "UID / GID :" $(id | cut -d " "  -f 1,2) | tee -a $log_file
 
 echo -e "\nDone." | tee -a $log_file
-echo -e "\nReboot now and continue with setup.\n" | tee -a $log_file
+echo -e "\nReboot now and run './revo/install/setup.sh' to continue.\n" | tee -a $log_file
 
 sudo reboot now

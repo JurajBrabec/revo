@@ -5,6 +5,6 @@ if [ ! -d ${PROJECT_ROOT}/config ]; then
   exit
 fi
 
-conf=${PROJECT_ROOT}/conf/jackett
+conf=${PROJECT_ROOT}/config/jackett
 
 mkdir -p $conf
