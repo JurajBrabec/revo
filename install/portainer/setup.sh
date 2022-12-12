@@ -19,9 +19,8 @@ if [ $? != 200 ]; then
 fi
 
 echo -e "Creating access token..." | tee -a $log_file
-api_token $(echo $response | jq -j '.jwt')
-response=$(api_call 'POST' '/api/users/1/tokens' \
-  '{"description": "homepage"}')
+api_token "Authorization: Bearer $(echo $response | jq -j '.jwt')"
+response=$(api_call 'POST' '/api/users/1/tokens' '{"description": "homepage"}')
 if [ $? != 201 ]; then
   echo -e "!!! ERROR $?" | tee -a $log_file
   api_clean

@@ -22,7 +22,7 @@ fi
 api_open "rdtclient.${DOMAIN}"
 
 response=$(api_call 'GET' '/Api/Authentication/IsLoggedIn')
-if echo $response | grep "Setup required" > /dev/null; then
+if echo $response | grep -qi "Setup required"; then
   echo -e "Setting up '${BASICAUTH_USERNAME}' user..." | tee -a $log_file
   response=$(api_call 'POST' '/Api/Authentication/Create' \
     '{"userName": "'${BASICAUTH_USERNAME}'","password": "'${BASICAUTH_PASSWORD}'"}')

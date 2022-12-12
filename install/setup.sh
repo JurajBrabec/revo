@@ -54,7 +54,7 @@ cd ${PROJECT_ROOT}
 echo -e "\nPulling images ..." | tee -a $log_file
 docker compose pull
 
-if ! docker network ls | grep ${DOCKER_NETWORK} >/dev/null; then
+if ! docker network ls | grep -q ${DOCKER_NETWORK}; then
   echo -e "\nCreating network '${DOCKER_NETWORK}'..." | tee -a $log_file
   docker network create ${DOCKER_NETWORK} >>$log_file 2>&1
   echo -e "\nStarting containers ..." | tee -a $log_file

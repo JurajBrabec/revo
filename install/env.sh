@@ -1,9 +1,10 @@
 SERVICES='traefik'
-OPTIONAL_SERVICES='pihole portainer rdtclient jackett prowlarr radarr sonarr lidarr whisparr bazarr watchtower homepage'
+OPTIONAL_SERVICES='pihole portainer rdtclient jackett radarr sonarr lidarr whisparr bazarr prowlarr watchtower homepage'
 
 ENV_FILE=${SCRIPT_DIR}/.env
 
-IP_ADDRESS=$(hostname -I | cut -d \  -f 1)
+export BASICAUTH_HASH=$(htpasswd -nbB "${BASICAUTH_USERNAME}" "${BASICAUTH_PASSWORD}" | cut -d : -f 2)
+export IP_ADDRESS=$(hostname -I | cut -d \  -f 1)
 
 set_env () {
   if [ -n "$1" ]; then

@@ -21,9 +21,17 @@ add_indexer () {
   fi
 }
 
-src=${PROJECT_ROOT}/install/jackett
-
 api_open "jackett.${DOMAIN}"
+
+api_content_type 'application/x-www-form-urlencoded'
+echo -e "Logging in..." | tee -a $log_file
+response=$(api_call 'POST' '/UI/Dashboard' 'password='${BASICAUTH_PASSWORD})
+if [ $? != 46 ]; then
+  echo -e "!!! ERROR $?" | tee -a $log_file
+  api_clean
+  return
+fi
+api_content_type 'application/json'
 
 echo -e "Retrieving API key..." | tee -a $log_file
 response=$(api_call 'GET' '/api/v2.0/server/config')
@@ -36,7 +44,7 @@ api_key=$(echo $response | jq -j '.api_key')
 set_env 'JACKETT_API_KEY' "$api_key"
 
 echo -e "Modifying configuration..." | tee -a $log_file
-config=$(echo $response | jq '.blackholedir="/downloads",.updatedisabled=true')
+config=$(echo $response | jq '.blackholedir="/downloads"|.updatedisabled=true')
 response=$(api_call 'POST' '/api/v2.0/server/config' "$config")
 if [ $? != 200 ]; then
   echo -e "!!! ERROR $?" | tee -a $log_file

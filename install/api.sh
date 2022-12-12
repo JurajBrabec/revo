@@ -1,5 +1,6 @@
 api_open () {
   API_HOST=$1
+  API_CONTENT_TYPE='application/json'
   API_C_FILE='/tmp/cookies.txt'
   API_D_FILE='/tmp/data.txt'
   API_H_FILE='/tmp/headers.txt'
@@ -9,6 +10,7 @@ api_open () {
 }
 
 api_clean () {
+  API_CONTENT_TYPE='application/json'
   API_EXITCODE=
   API_STATUS=
   API_TOKEN=
@@ -29,9 +31,12 @@ api_clean () {
   fi
 }
 
+api_content_type () {
+  API_CONTENT_TYPE=$1
+}
 api_token () {
     API_TOKEN=$1
-    echo "Authorization: Bearer $1">$API_T_FILE
+    echo "$1">$API_T_FILE
 }
 api_call () {
   local method="$1"
@@ -47,7 +52,11 @@ api_call () {
   fi
   if [ "$method" != "GET" ]; then
     echo $data>$API_D_FILE
-    local command="$command --json @$API_D_FILE"
+    if [ -z "$API_CONTENT_TYPE" ] || [ $API_CONTENT_TYPE == 'application/json' ]; then
+      local command="$command --json @$API_D_FILE"
+    elif [ $API_CONTENT_TYPE == 'application/x-www-form-urlencoded' ]; then
+      local command="$command -H 'Content-Type: ${API_CONTENT_TYPE}' --data-urlencode @$API_D_FILE"
+    fi
   fi
   echo C: $command >> $log_file
 
@@ -58,6 +67,12 @@ api_call () {
     if [ "$API_EXITCODE" == "0" ] && [ "$API_STATUS" != "404" ] && [ "$API_STATUS" != "502" ]; then
       break
     fi
+    if [ "$API_EXITCODE" == "6" ] && [ "$API_STATUS" == "302" ] && [ "$method" == "POST" ]; then
+      break
+    fi
+    if [ "$API_EXITCODE" == "6" ] && [ "$API_STATUS" == "401" ] && [ "$method" == "POST" ]; then
+      break
+    fi
     echo "+:$API_EXITCODE/$API_STATUS" >> $log_file
     sleep 1
   done
@@ -65,7 +80,7 @@ api_call () {
   echo E: $API_EXITCODE >> $log_file
   echo S: $API_STATUS >> $log_file
   echo O: >> $log_file
-  cat $API_O_FILE >> $log_file
+  cat $API_O_FILE | tee -a $log_file
 
 #  echo -e "\nH:" >> $log_file
 #  cat $API_H_FILE >> $log_file
@@ -77,6 +92,5 @@ api_call () {
 #  fi
 
   echo -e "---\n" >> $log_file
-  cat $API_O_FILE
   return $(($API_STATUS))
 }

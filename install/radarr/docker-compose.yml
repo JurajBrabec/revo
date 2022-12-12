@@ -1,0 +1,22 @@
+services:
+  radarr:
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    expose:
+      - 7878
+    image: lscr.io/linuxserver/radarr:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)'
+      - 'traefik.http.routers.radarr.tls=true'
+    networks:
+      - default
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/config/radarr:/config'
+      - '${PROJECT_ROOT}/data/downloads:/downloads'
+      - '${PROJECT_ROOT}/data/share/movies:/movies'
