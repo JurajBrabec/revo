@@ -6,10 +6,9 @@ if [ ! -d ${PROJECT_ROOT}/config ]; then
 fi
 
 conf=${PROJECT_ROOT}/config/pihole
-src=${PROJECT_ROOT}/install/pihole/config
 
 mkdir -p $conf
-cp -rf $src/* $conf
+cp -rf ./config/* $conf
 
 for service in ${SERVICES}; do
   echo $IP_ADDRESS $service.${DOMAIN} >> $conf/pihole/custom.list

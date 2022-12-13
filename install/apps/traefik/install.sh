@@ -7,8 +7,8 @@ fi
 
 conf=${PROJECT_ROOT}/config/traefik
 
-mkdir -p $conf
-cp -rf ${PROJECT_ROOT}/install/traefik/config/* $conf
+mkdir -p $conf/certs
+cp -rf ./config/* $conf
 
 sed -i 's/${DOMAIN}/'${DOMAIN}'/' $conf/traefik.yml
 
@@ -19,7 +19,7 @@ ext_file=/tmp/domains.ext
 names=($SERVICES)
 
 if [ ! -f $certs/RootCA.crt ]; then
-  echo -e "Generating root cerificates for ${ROOT_CA_SUBJECT}..." | tee -a $log_file
+  echo -e "Generating root cerificates for ${ROOT_CA_SUBJECT} ..." | tee -a $log_file
   openssl req -x509 -nodes -new -sha256 -days 1024 -newkey rsa:2048 -keyout $certs/RootCA.key -out $certs/RootCA.pem -subj ${ROOT_CA_SUBJECT} >>$log_file 2>&1
   openssl x509 -outform pem -in $certs/RootCA.pem -out $certs/RootCA.crt >>$log_file 2>&1
 fi

@@ -5,6 +5,4 @@ if [ ! -d ${PROJECT_ROOT}/data ]; then
   exit
 fi
 
-data=${PROJECT_ROOT}/data/portainer
-
-mkdir -p $data
+mkdir -p ${PROJECT_ROOT}/data/homepage

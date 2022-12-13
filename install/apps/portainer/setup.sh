@@ -9,7 +9,7 @@ source ${SCRIPT_DIR}/api.sh
 
 api_open "portainer.${DOMAIN}"
 
-echo -e "Logging in as '${BASICAUTH_USERNAME}'..." | tee -a $log_file
+echo -e "Logging in as '${BASICAUTH_USERNAME}' ..." | tee -a $log_file
 response=$(api_call 'POST' '/api/auth' \
   '{"username": "'${BASICAUTH_USERNAME}'","password": "'${BASICAUTH_PASSWORD}'"}')
 if [ $? != 200 ]; then
@@ -18,7 +18,7 @@ if [ $? != 200 ]; then
   return
 fi
 
-echo -e "Creating access token..." | tee -a $log_file
+echo -e "Creating access token ..." | tee -a $log_file
 api_token "Authorization: Bearer $(echo $response | jq -j '.jwt')"
 response=$(api_call 'POST' '/api/users/1/tokens' '{"description": "homepage"}')
 if [ $? != 201 ]; then

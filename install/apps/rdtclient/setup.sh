@@ -23,7 +23,7 @@ api_open "rdtclient.${DOMAIN}"
 
 response=$(api_call 'GET' '/Api/Authentication/IsLoggedIn')
 if echo $response | grep -qi "Setup required"; then
-  echo -e "Setting up '${BASICAUTH_USERNAME}' user..." | tee -a $log_file
+  echo -e "Setting up '${BASICAUTH_USERNAME}' user ..." | tee -a $log_file
   response=$(api_call 'POST' '/Api/Authentication/Create' \
     '{"userName": "'${BASICAUTH_USERNAME}'","password": "'${BASICAUTH_PASSWORD}'"}')
   if [ $? != 200 ]; then
@@ -32,7 +32,7 @@ if echo $response | grep -qi "Setup required"; then
     return
   fi
   if [ -n "$RDTCLIENT_PROVIDER" ]; then
-    echo -e "Setting up '${name}' provider..." | tee -a $log_file
+    echo -e "Setting up '${name}' provider ..." | tee -a $log_file
     response=$(api_call 'POST' '/Api/Authentication/SetupProvider' \
       '{"provider": "'${RDTCLIENT_PROVIDER}'","token": "'${RDTCLIENT_TOKEN}'"}')
     if [ $? != 200 ]; then
@@ -47,7 +47,7 @@ else
   echo -e "No user set up required." | tee -a $log_file
 fi
 
-echo -e "Logging in as '${BASICAUTH_USERNAME}'..." | tee -a $log_file
+echo -e "Logging in as '${BASICAUTH_USERNAME}' ..." | tee -a $log_file
 response=$(api_call 'POST' '/Api/Authentication/Login' \
   '{"userName": "'${BASICAUTH_USERNAME}'","password": "'${BASICAUTH_PASSWORD}'"}')
 if [ $? != 200 ]; then
@@ -56,7 +56,7 @@ if [ $? != 200 ]; then
   return
 fi
 
-echo -e "Modifying configuration..." | tee -a $log_file
+echo -e "Modifying configuration ..." | tee -a $log_file
 response=$(api_call 'PUT' '/Api/Settings' \
   '[{"key": "DownloadClient:MappedPath","value": "/downloads","type": "String"}]')
 if [ $? != 200 ]; then

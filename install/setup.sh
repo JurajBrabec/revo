@@ -28,12 +28,9 @@ services:
 EOF
 
 for service in ${SERVICES}; do
-  if [ -f ${PROJECT_ROOT}/install/$service/install.sh ]; then
-    echo -e "Installing service '$service' ..." | tee -a $log_file
-    cd ${PROJECT_ROOT}/install/$service
-    source ${PROJECT_ROOT}/install/$service/install.sh
-    docker compose --env-file $ENV_FILE convert | grep "^services:" -A 999 | grep "networks:" -B 999 | grep -Ev "^(networks|services):" >> $docker_compose
-  fi
+  echo -e "Installing service '$service' ..." | tee -a $log_file
+  cd ${PROJECT_ROOT}/install/apps/$service && source install.sh
+  docker compose --env-file $ENV_FILE convert | grep "^services:" -A 999 | grep "networks:" -B 999 | grep -Ev "^(networks|services):" >> $docker_compose
 done
 
 cat >> $docker_compose << EOF
@@ -51,22 +48,22 @@ echo -e "\nPulling images ..." | tee -a $log_file
 docker compose pull -q
 
 if ! docker network ls | grep -q ${DOCKER_NETWORK}; then
-  echo -e "\nCreating network '${DOCKER_NETWORK}'..." | tee -a $log_file
+  echo -e "\nCreating network '${DOCKER_NETWORK}' ..." | tee -a $log_file
   docker network create ${DOCKER_NETWORK} >>$log_file 2>&1
   echo -e "\nStarting containers ..." | tee -a $log_file
-  docker compose up -d
+  docker compose up --no-color -d
 else
   echo -e "\nRestarting containers ..." | tee -a $log_file
-  docker compose restart
+  docker compose restart --no-color
 fi
 
 #post configuration
 echo -e "\nSetting up services ..." | tee -a $log_file
 
 for service in ${SERVICES}; do
-  if [ -f ${PROJECT_ROOT}/install/$service/setup.sh ]; then
+  if [ -f ${PROJECT_ROOT}/install/apps/$service/setup.sh ]; then
     echo -e "\nSetting up service '$service' ..." | tee -a $log_file
-    source ${PROJECT_ROOT}/install/$service/setup.sh
+    cd ${PROJECT_ROOT}/install/apps/$service && source setup.sh
   fi
 done
 

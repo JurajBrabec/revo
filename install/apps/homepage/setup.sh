@@ -5,9 +5,7 @@ if [ ! -d ${PROJECT_ROOT}/data ]; then
   exit
 fi
 
-src=${PROJECT_ROOT}/install/homepage/config
-
-#sed -i 's/${DOCKER_SOCKET}/'${DOCKER_SOCKET}'/' $conf/docker.yaml
+src=./config
 
 envsubst < $src/docker.yaml > $conf/docker.yaml
 envsubst < $src/settings.yaml > $conf/settings.yaml
@@ -15,8 +13,7 @@ envsubst < $src/widgets.yaml > $conf/widgets.yaml
 envsubst < $src/services.yaml > $conf/services.yaml
 
 for service in ${OPTIONAL_SERVICES}; do
-  IS_ENABLED=${service^^}_ENABLED
-  if [ -z ${!IS_ENABLED} ]; then
+  if ! echo ${SERVICES} | grep -qi $service; then
     sed -i '/#'$service'/, /#/ {//!d}' $conf/services.yaml
   fi
 done

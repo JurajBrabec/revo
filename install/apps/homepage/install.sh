@@ -6,7 +6,6 @@ if [ ! -d ${PROJECT_ROOT}/config ]; then
 fi
 
 conf=${PROJECT_ROOT}/config/homepage
-src=${PROJECT_ROOT}/install/homepage/config
 
 mkdir -p $conf
-cp -rf ${PROJECT_ROOT}/install/homepage/config/* $conf
+cp -rf ./config/* $conf

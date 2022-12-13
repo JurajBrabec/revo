@@ -1,0 +1,20 @@
+services:
+  prowlarr:
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    expose:
+      - 9696
+    image: lscr.io/linuxserver/prowlarr:develop
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.prowlarr.rule=Host(`prowlarr.${DOMAIN}`)'
+      - 'traefik.http.routers.prowlarr.tls=true'
+    networks:
+      - default
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/config/prowlarr:/config'

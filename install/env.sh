@@ -18,7 +18,7 @@ export IP_ADDRESS=$(hostname -I | cut -d \  -f 1)
 
 for service in ${OPTIONAL_SERVICES}; do
   IS_ENABLED=${service^^}_ENABLED
-  if [ ! -z ${!IS_ENABLED} ]; then
+  if [ "${!IS_ENABLED}" = "1" ] || [ "${!IS_ENABLED^^}" = "TRUE" ]; then
     SERVICES="${SERVICES} $service"
   fi
 done
