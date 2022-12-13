@@ -4,12 +4,12 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 log_file=${SCRIPT_DIR}/log/install.log
 mkdir -p ${SCRIPT_DIR}/log
 
-#if [[ $(/usr/bin/id -u) -ne 0 ]]; then
-#    echo -e "Not running as root." | tee -a $log_file
-#    exit
-#fi
-
 echo -e "\nSystem Installation\n" | tee $log_file
+
+if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+    echo -e "Not running as root." | tee -a $log_file
+    exit
+fi
 
 chmod +x ${SCRIPT_DIR}/*.sh
 
@@ -48,6 +48,7 @@ sudo lsof -i :53 >>$log_file 2>&1
 
 echo -e "\nIP address:" $(hostname -I | cut -d \  -f 1) | tee -a $log_file
 echo -e "UID / GID :" $(id | cut -d " "  -f 1,2) | tee -a $log_file
+echo -e "UID / GID :" $(su -c "id" $SUDO_USER | cut -d " "  -f 1,2) | tee -a $log_file
 
 echo -e "\nDone." | tee -a $log_file
 echo -e "\nReboot now and run './revo/install/setup.sh' to continue.\n" | tee -a $log_file

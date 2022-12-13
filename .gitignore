@@ -3,4 +3,4 @@
 .env
 reload.cmd
 test.sh
-/install/traefik/config/certs/RootCA.*
+/install/traefik/config/certs/
