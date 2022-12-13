@@ -54,7 +54,7 @@ if ! docker network ls | grep -q ${DOCKER_NETWORK}; then
   docker compose up --no-color -d
 else
   echo -e "\nRestarting containers ..." | tee -a $log_file
-  docker compose restart --no-color
+  docker compose up --force-recreate --no-color -d
 fi
 
 #post configuration

@@ -56,11 +56,16 @@ api_call () {
       local command="$command --json @$API_D_FILE"
     elif [ $API_CONTENT_TYPE == 'application/x-www-form-urlencoded' ]; then
       local command="$command -H 'Content-Type: ${API_CONTENT_TYPE}' --data-urlencode @$API_D_FILE"
+    elif [ $API_CONTENT_TYPE == 'multipart/form-data' ]; then
+      for item in $(cat $API_D_FILE); do
+        local command="$command -F $item"
+      done
     fi
   fi
   echo C: $command >> $log_file
 
-  while true; do
+  declare -i try=1
+  while [ $try -le 10 ]; do
     $command 2>&1 > $API_O_FILE
     API_EXITCODE=$?
     API_STATUS=$(cat $API_H_FILE | grep "^HTTP/. " | tail -n 1 | cut -d \  -f 2)
@@ -75,6 +80,7 @@ api_call () {
     fi
     echo "+:$API_EXITCODE/$API_STATUS" >> $log_file
     sleep 1
+    try+=1
   done
 
   echo E: $API_EXITCODE >> $log_file

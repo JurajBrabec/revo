@@ -1,0 +1,21 @@
+services:
+  bazarr:
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    expose:
+      - 6767
+    image: lscr.io/linuxserver/bazarr:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN}`)'
+      - 'traefik.http.routers.bazarr.tls=true'
+    networks:
+      - default
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/config/bazarr:/config'
+      - '${PROJECT_ROOT}/data/downloads:/downloads'
