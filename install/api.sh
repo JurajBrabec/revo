@@ -65,7 +65,7 @@ api_call () {
   echo C: $command >> $log_file
 
   declare -i try=1
-  while [ $try -le 10 ]; do
+  while [ $try -le 30 ]; do
     $command 2>&1 > $API_O_FILE
     API_EXITCODE=$?
     API_STATUS=$(cat $API_H_FILE | grep "^HTTP/. " | tail -n 1 | cut -d \  -f 2)

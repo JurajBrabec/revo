@@ -25,11 +25,10 @@ api_token "x-api-key: $api_key"
 
 api_content_type 'multipart/form-data'
 
-echo -e "Setting languages..." | tee -a $log_file
-
 payload=
 declare -i id=1
 for language in ${BAZARR_LANGUAGES,,}; do
+  echo -e "Adding '$language' language..." | tee -a $log_file
   payload="$payload languages-enabled=$language"
   items="$items"'{"id":'$id',"language":"'$language'","audio_exclude":"False","hi":"False","forced":"False"},'
   id+=1
@@ -50,7 +49,7 @@ if [ $? != 204 ]; then
   return
 fi
 
-echo -e "Setting applications..." | tee -a $log_file
+echo -e "Adding applications..." | tee -a $log_file
 
 payload="settings-general-use_sonarr=true \
   settings-sonarr-ip=sonarr \
@@ -68,10 +67,10 @@ if [ $? != 204 ]; then
   return
 fi
 
-echo -e "Setting providers..." | tee -a $log_file
 
 payload=
 for provider in ${BAZARR_PROVIDERS,,}; do
+  echo -e "Adding '$provider' provider..." | tee -a $log_file
   payload="$payload settings-general-enabled_providers=$provider"
 done
 response=$(api_call 'POST' $api_root "$payload")
@@ -81,7 +80,7 @@ if [ $? != 204 ]; then
   return
 fi
 
-echo -e "Setting notifications..." | tee -a $log_file
+echo -e "Adding notification..." | tee -a $log_file
 response=$(api_call 'GET' $api_root)
 if [ $? != 200 ]; then
   echo -e "!!! ERROR $?" | tee -a $log_file
@@ -104,7 +103,7 @@ for schema in "${schemas[@]}"; do
   fi
 done
 
-echo -e "Setting credentials ..." | tee -a $log_file
+echo -e "Setting up credentials ..." | tee -a $log_file
 
 payload="settings-auth-type=form \
   settings-auth-username=${BASICAUTH_USERNAME} \

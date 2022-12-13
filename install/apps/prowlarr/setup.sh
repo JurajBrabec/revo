@@ -21,8 +21,7 @@ api_key=$(echo $response | cut -d \' -f4)
 set_env 'PROWLARR_API_KEY' "$api_key"
 api_token "x-api-key: $api_key"
 
-
-add_application () {
+add_app () {
   for schema in "${schemas[@]}"; do
     if echo $schema | jq -j '.implementation' | grep -qi "$1"; then
       echo -e "Adding application '${1,,}' ..." | tee -a $log_file
@@ -40,6 +39,32 @@ add_application () {
   done
 }
 
+add_jackett_indexer () {
+  echo -e "Adding indexer '$1' ..." | tee -a $log_file
+  url="http://jackett:9117/api/v2.0/indexers/$1/results/torznab/"
+  fields=$(echo $2 | jq -j '.fields')
+  fields=$(echo $fields | jq 'map(select(.name=="baseUrl").value="'$url'")')
+  fields=$(echo $fields | jq 'map(select(.name=="apiKey").value="'${JACKETT_API_KEY}'")')
+  payload=$(echo $2 | jq -c '.appProfileId=1|.enable=true|.name="'$1'"|.fields='"$fields")
+  response=$(api_call 'POST' "$route?" "$payload")
+  if [ $? != 201 ]; then
+    echo -e "!!! ERROR $?" | tee -a $log_file
+    return
+  fi
+}
+
+route="$api_root/indexer"
+response=$(api_call 'GET' "$route/schema")
+if [ $? != 200 ]; then
+  echo -e "!!! ERROR $?" | tee -a $log_file
+  api_clean
+  return
+fi
+schema=$(echo $response | jq '.[] | select(.name=="Generic Torznab")')
+for indexer in ${JACKETT_INDEXERS}; do
+  add_jackett_indexer "$indexer" "$schema"
+done
+
 route="$api_root/applications"
 response=$(api_call 'GET' "$route/schema")
 if [ $? != 200 ]; then
@@ -49,10 +74,10 @@ if [ $? != 200 ]; then
 fi
 readarray -t schemas < <(echo $response | jq -c '.[]')
 
-echo ${SERVICES} | grep -qi "lidarr" && add_application "Lidarr" "http://lidarr:8686" "${LIDARR_API_KEY}"
-echo ${SERVICES} | grep -qi "radarr" && add_application "Radarr" "http://radarr:7878" "${RADARR_API_KEY}"
-echo ${SERVICES} | grep -qi "sonarr" && add_application "Sonarr" "http://sonarr:8989" "${SONARR_API_KEY}"
-echo ${SERVICES} | grep -qi "whisparr" && add_application "Whisparr" "http://whisparr:6969" "${WHISPARR_API_KEY}"
+echo ${SERVICES} | grep -qi "lidarr" && add_app "Lidarr" "http://lidarr:8686" "${LIDARR_API_KEY}"
+echo ${SERVICES} | grep -qi "radarr" && add_app "Radarr" "http://radarr:7878" "${RADARR_API_KEY}"
+echo ${SERVICES} | grep -qi "sonarr" && add_app "Sonarr" "http://sonarr:8989" "${SONARR_API_KEY}"
+echo ${SERVICES} | grep -qi "whisparr" && add_app "Whisparr" "http://whisparr:6969" "${WHISPARR_API_KEY}"
 
 echo -e "Adding download client ..." | tee -a $log_file
 
