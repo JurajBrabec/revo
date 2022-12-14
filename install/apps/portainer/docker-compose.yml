@@ -1,6 +1,6 @@
 services:
   portainer:
-    command: -H unix:///var/run/docker.sock --admin-password '${BASICAUTH_HASH}'
+    command: -H unix:///var/run/docker.sock --admin-password '${HASH}'
     container_name: portainer
     environment:
       - PUID=${PUID}

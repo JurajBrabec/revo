@@ -1,0 +1,15 @@
+services:
+  dozzle:
+    container_name: dozzle
+    expose:
+      - 8080
+    image: amir20/dozzle:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.dozzle.rule=Host(`dozzle.${DOMAIN}`)'
+      - 'traefik.http.routers.dozzle.tls=true'
+    networks:
+      - default
+    restart: always
+    volumes:
+      - ${DOCKER_SOCKET}:/var/run/docker.sock

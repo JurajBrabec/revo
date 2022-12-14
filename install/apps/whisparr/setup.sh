@@ -45,8 +45,8 @@ for schema in "${schemas[@]}"; do
     fields=$(echo $schema | jq -j '.fields')
     fields=$(echo $fields | jq 'map(select(.name=="host").value="rdtclient")')
     fields=$(echo $fields | jq 'map(select(.name=="port").value=6500)')
-    fields=$(echo $fields | jq 'map(select(.name=="username").value="'${BASICAUTH_USERNAME}'")')
-    fields=$(echo $fields | jq 'map(select(.name=="password").value="'${BASICAUTH_PASSWORD}'")')
+    fields=$(echo $fields | jq 'map(select(.name=="username").value="'${USERNAME}'")')
+    fields=$(echo $fields | jq 'map(select(.name=="password").value="'${PASSWORD}'")')
     fields=$(echo $fields | jq 'map(select(.name=="movieCategory").value="whisparr")')
     payload=$(echo $schema | jq '.enable=true|.name="RDTClient"|.fields='"$fields")
     response=$(api_call 'POST' "$route?" "$payload")
@@ -99,7 +99,7 @@ echo -e "Setting up credentials ..." | tee -a $log_file
 
 route="$api_root/config/host"
 response=$(api_call 'GET' $route)
-payload=$(echo $response | jq '.analyticsEnabled=false|.authenticationMethod="forms"|.password="'${BASICAUTH_PASSWORD}'"|.username="'${BASICAUTH_USERNAME}'"')
+payload=$(echo $response | jq '.analyticsEnabled=false|.authenticationMethod="forms"|.password="'${PASSWORD}'"|.username="'${USERNAME}'"')
 response=$(api_call 'PUT' $route "$payload")
 if [ $? != 202 ]; then
   echo -e "!!! ERROR $?" | tee -a $log_file

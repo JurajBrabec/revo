@@ -23,9 +23,9 @@ api_open "rdtclient.${DOMAIN}"
 
 response=$(api_call 'GET' '/Api/Authentication/IsLoggedIn')
 if echo $response | grep -qi "Setup required"; then
-  echo -e "Setting up '${BASICAUTH_USERNAME}' user ..." | tee -a $log_file
+  echo -e "Setting up '${USERNAME}' user ..." | tee -a $log_file
   response=$(api_call 'POST' '/Api/Authentication/Create' \
-    '{"userName": "'${BASICAUTH_USERNAME}'","password": "'${BASICAUTH_PASSWORD}'"}')
+    '{"userName": "'${USERNAME}'","password": "'${PASSWORD}'"}')
   if [ $? != 200 ]; then
     echo -e "!!! ERROR $?" | tee -a $log_file
     api_clean
@@ -47,9 +47,9 @@ else
   echo -e "No user set up required." | tee -a $log_file
 fi
 
-echo -e "Logging in as '${BASICAUTH_USERNAME}' ..." | tee -a $log_file
+echo -e "Logging in as '${USERNAME}' ..." | tee -a $log_file
 response=$(api_call 'POST' '/Api/Authentication/Login' \
-  '{"userName": "'${BASICAUTH_USERNAME}'","password": "'${BASICAUTH_PASSWORD}'"}')
+  '{"userName": "'${USERNAME}'","password": "'${PASSWORD}'"}')
 if [ $? != 200 ]; then
   echo -e "!!! ERROR $?" | tee -a $log_file
   api_clean

@@ -106,8 +106,8 @@ done
 echo -e "Setting up credentials ..." | tee -a $log_file
 
 payload="settings-auth-type=form \
-  settings-auth-username=${BASICAUTH_USERNAME} \
-  settings-auth-password=${BASICAUTH_PASSWORD} \
+  settings-auth-username=${USERNAME} \
+  settings-auth-password=${PASSWORD} \
   settings-analytics-enabled=false"
 response=$(api_call 'POST' $api_root "$payload")
 if [ $? != 204 ]; then

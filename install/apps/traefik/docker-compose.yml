@@ -9,7 +9,7 @@ services:
     image: traefik:latest
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.middlewares.login.basicauth.users=${BASICAUTH_USERNAME}:${BASICAUTH_HASH}'
+      - 'traefik.http.middlewares.login.basicauth.users=${USERNAME}:${HASH}'
       - 'traefik.http.routers.api.rule=Host(`traefik.${DOMAIN}`) && PathPrefix(`/api`)'
       - 'traefik.http.routers.api.service=api@internal'
       - 'traefik.http.routers.api.tls=true'

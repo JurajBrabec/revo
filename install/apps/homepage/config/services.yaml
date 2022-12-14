@@ -32,7 +32,7 @@
           type: portainer
           url: http://portainer:9000
           env: 1
-          key: ${PORTAINER_ACCESS_TOKEN}
+          key: '${PORTAINER_ACCESS_TOKEN}'
     #watchtower
     - Watch Tower:
         icon: watchtower.png
@@ -42,7 +42,15 @@
         widget:
           type: watchtower
           url: http://watchtower:8080
-          key: ${WATCHTOWER_API_TOKEN}
+          key: '${WATCHTOWER_API_TOKEN}'
+    #dozzle
+    - Dozzle:
+        icon: dozzle.png
+        href: https://dozzle.${DOMAIN}
+        description: Dozzle
+        server: docker
+        container: dozzle
+    #
 - Multimedia:
     #radarr
     - Radarr:
@@ -54,7 +62,7 @@
         widget:
           type: radarr
           url: http://radarr:7878
-          key: ${RADARR_API_KEY}
+          key: '${RADARR_API_KEY}'
     #sonarr
     - Sonarr:
         icon: sonarr.png
@@ -65,7 +73,7 @@
         widget:
           type: sonarr
           url: http://sonarr:8989
-          key: ${SONARR_API_KEY}
+          key: '${SONARR_API_KEY}'
     #lidarr
     - Lidarr:
         icon: lidarr.png
@@ -76,7 +84,7 @@
         widget:
           type: lidarr
           url: http://lidarr:8686
-          key: ${LIDARR_API_KEY}
+          key: '${LIDARR_API_KEY}'
     #bazarr
     - Bazarr:
         icon: bazarr.png
@@ -87,7 +95,7 @@
         widget:
           type: bazarr
           url: http://bazarr:6767
-          key: ${BAZARR_API_KEY}
+          key: '${BAZARR_API_KEY}'
     #whisparr
     - Whisparr:
         icon: whisparr.png
@@ -98,7 +106,8 @@
         widget:
           type: radarr
           url: http://whisparr:6969
-          key: ${WHISPARR_API_KEY}
+          key: '${WHISPARR_API_KEY}'
+    #
 - Download:
     #jackett
     - Jackett:
@@ -117,7 +126,7 @@
         widget:
           type: prowlarr
           url: http://prowlarr:9696
-          key: ${PROWLARR_API_KEY}
+          key: '${PROWLARR_API_KEY}'
     #rdtclient
     - RDT Client:
         icon: qbittorrent.png
@@ -125,3 +134,8 @@
         description: RDT Client
         server: docker
         container: rdtclient
+        widget:
+          type: qbittorrent
+          url: http://rdtclient:6500
+          username: '${USERNAME}'
+          password: '${PASSWORD}'

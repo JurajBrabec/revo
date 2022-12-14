@@ -9,9 +9,9 @@ source ${SCRIPT_DIR}/api.sh
 
 api_open "portainer.${DOMAIN}"
 
-echo -e "Logging in as '${BASICAUTH_USERNAME}' ..." | tee -a $log_file
+echo -e "Logging in as '${USERNAME}' ..." | tee -a $log_file
 response=$(api_call 'POST' '/api/auth' \
-  '{"username": "'${BASICAUTH_USERNAME}'","password": "'${BASICAUTH_PASSWORD}'"}')
+  '{"username": "'${USERNAME}'","password": "'${PASSWORD}'"}')
 if [ $? != 200 ]; then
   echo -e "!!! ERROR $?" | tee -a $log_file
   api_clean

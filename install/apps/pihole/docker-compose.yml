@@ -10,7 +10,7 @@ services:
       - UMASK=${UMASK}
       - PIHOLE_DNS1=${PIHOLE_DNS1}
       - DNSMASQ_LISTENING=local
-      - WEBPASSWORD=${BASICAUTH_PASSWORD}
+      - WEBPASSWORD=${PASSWORD}
     expose:
       - 80
     hostname: pihole

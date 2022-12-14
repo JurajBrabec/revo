@@ -25,7 +25,7 @@ api_open "jackett.${DOMAIN}"
 
 api_content_type 'application/x-www-form-urlencoded'
 echo -e "Logging in ..." | tee -a $log_file
-response=$(api_call 'POST' '/UI/Dashboard' 'password='${BASICAUTH_PASSWORD})
+response=$(api_call 'POST' '/UI/Dashboard' 'password='${PASSWORD})
 if [ $? != 46 ]; then
   echo -e "!!! ERROR $?" | tee -a $log_file
   api_clean
@@ -57,7 +57,7 @@ for indexer in ${JACKETT_INDEXERS}; do
 done
 
 echo -e "Changing admin password ..." | tee -a $log_file
-response=$(api_call 'POST' '/api/v2.0/server/adminpassword' '"'${BASICAUTH_PASSWORD}'"')
+response=$(api_call 'POST' '/api/v2.0/server/adminpassword' '"'${PASSWORD}'"')
 if [ $? != 204 ]; then
   echo -e "!!! ERROR $?" | tee -a $log_file
   api_clean
