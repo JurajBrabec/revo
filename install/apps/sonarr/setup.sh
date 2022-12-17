@@ -6,109 +6,31 @@ if [ ! -d ${PROJECT_ROOT}/config ]; then
 fi
 
 source ${SCRIPT_DIR}/api.sh
+source ${SCRIPT_DIR}/arr_api.sh
 
-api_open "sonarr.${DOMAIN}"
+sonarr_rootfolder () {
+  arr_rootfolder '/tv'
+  return $?
+}
 
-echo -e "Retrieving API key ..." | tee -a $log_file
-response=$(api_call 'GET' '/initialize.js')
-if [ $? != 200 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
+sonarr_downloadclient () {
+  arr_downloadclient 'tvCategory'
+  return $?
+}
+
+sonarr_notification () {
+  arr_notification '.onGrab=true|.onDownload=true|.onUpgrade=true|.onRename=true|.onSeriesDelete=true|.onEpisodeFileDelete=true|.onEpisodeFileDeleteForUpgrade=true|.onHealthIssue=true|.onApplicationUpdate=true|.includeHealthWarnings=true'
+  return $?
+}
+
+arr_open "sonarr"
+set_env 'SONARR_API_KEY' "$API_KEY"
+
+sonarr_rootfolder && sonarr_downloadclient && sonarr_notification && arr_ui && arr_credentials && arr_restart && {
+  echo 'Success.' | tee -a $log_file
   api_clean
-  return
-fi
-api_root=$(echo $response | cut -d \' -f2)
-api_key=$(echo $response | cut -d \' -f4)
-set_env 'SONARR_API_KEY' "$api_key"
-api_token "x-api-key: $api_key"
-
-echo -e "Adding root folder ..." | tee -a $log_file
-
-response=$(api_call 'POST' "$api_root/rootFolder" '{"path":"/tv"}')
-if [ $? != 201 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-
-echo -e "Adding download client ..." | tee -a $log_file
-
-route="$api_root/downloadclient"
-response=$(api_call 'GET' "$route/schema")
-if [ $? != 200 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-readarray -t schemas < <(echo $response | jq -c '.[]')
-for schema in "${schemas[@]}"; do
-  if echo $schema | jq -j '.implementation' | grep -qi 'qbittorrent'; then
-    fields=$(echo $schema | jq -j '.fields')
-    fields=$(echo $fields | jq 'map(select(.name=="host").value="rdtclient")')
-    fields=$(echo $fields | jq 'map(select(.name=="port").value=6500)')
-    fields=$(echo $fields | jq 'map(select(.name=="username").value="'${USERNAME}'")')
-    fields=$(echo $fields | jq 'map(select(.name=="password").value="'${PASSWORD}'")')
-    fields=$(echo $fields | jq 'map(select(.name=="tvCategory").value="sonarr")')
-    payload=$(echo $schema | jq '.enable=true|.name="RDTClient"|.fields='"$fields")
-    response=$(api_call 'POST' "$route?" "$payload")
-    if [ $? != 201 ]; then
-      echo -e "!!! ERROR $?" | tee -a $log_file
-      api_clean
-      return
-    fi
-  fi
-done
-
-echo -e "Adding notification ..." | tee -a $log_file
-
-route="$api_root/notification"
-response=$(api_call 'GET' "$route/schema")
-if [ $? != 200 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-provider=$(echo ${NOTIFICATION_URL} | cut -d : -f 1)
-token=$(echo ${NOTIFICATION_URL} | cut -d / -f 3)
-readarray -t schemas < <(echo $response | jq -c '.[]')
-for schema in "${schemas[@]}"; do
-  if echo $schema | jq -j '.implementation' | grep -qi $provider; then
-    fields=$(echo $schema | jq -j '.fields' | jq 'map(select(.name=="apiKey").value="'$token'")')
-    payload=$(echo $schema | jq '.onGrab=true|.onDownload=true|.onUpgrade=true|.onRename=true|.onSeriesDelete=true|.onEpisodeFileDelete=true|.onEpisodeFileDeleteForUpgrade=true|.onHealthIssue=true|.onApplicationUpdate=true|.includeHealthWarnings=true|.name="Pushbullet"|.fields='"$fields")
-    response=$(api_call 'POST' "$route?" "$payload")
-    if [ $? != 201 ]; then
-      echo -e "!!! ERROR $?" | tee -a $log_file
-      api_clean
-      return
-    fi
-  fi
-done
-
-echo -e "Setting up UI ..." | tee -a $log_file
-
-route="$api_root/config/ui"
-response=$(api_call 'GET' $route)
-payload=$(echo $response | jq '.firstDayOfWeek=1|.calendarWeekColumnHeader="ddd D/M"|.shortDateFormat="DD MMM YYYY"|.longDateFormat="dddd, D MMMM YYYY"|.timeFormat="HH:mm"')
-response=$(api_call 'PUT' $route "$payload")
-if [ $? != 202 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-
-echo -e "Setting up credentials ..." | tee -a $log_file
-
-route="$api_root/config/host"
-response=$(api_call 'GET' $route)
-payload=$(echo $response | jq '.analyticsEnabled=false|.authenticationMethod="forms"|.password="'${PASSWORD}'"|.username="'${USERNAME}'"')
-response=$(api_call 'PUT' $route "$payload")
-if [ $? != 202 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-
-response=$(api_call 'POST' "$api_root/system/restart")
-
-echo 'Success.' | tee -a $log_file
-
+  return 0
+}
+echo -e "!!! ERROR $(api_status)" | tee -a $log_file
 api_clean
+return -1

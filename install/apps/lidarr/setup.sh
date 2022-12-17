@@ -6,118 +6,66 @@ if [ ! -d ${PROJECT_ROOT}/config ]; then
 fi
 
 source ${SCRIPT_DIR}/api.sh
+source ${SCRIPT_DIR}/arr_api.sh
 
-api_open "lidarr.${DOMAIN}"
+lidarr_rootfolder () {
+  echo -e "Adding root folder ..." | tee -a $log_file
 
-echo -e "Retrieving API key ..." | tee -a $log_file
-response=$(api_call 'GET' '/initialize.js')
-if [ $? != 200 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-api_root=$(echo $response | cut -d \' -f2)
-api_key=$(echo $response | cut -d \' -f4)
-set_env 'LIDARR_API_KEY' "$api_key"
-api_token "x-api-key: $api_key"
-
-echo -e "Adding root folder ..." | tee -a $log_file
-
-response=$(api_call 'POST' "$api_root/rootFolder" '{
-  "name": "music",
-  "path": "/music",
-  "defaultMetadataProfileId": 1,
-  "defaultQualityProfileId": 1,
-  "defaultMonitorOption": "all",
-  "defaultNewItemMonitorOption": "all",
-  "defaultTags": [],
-  "accessible": true
-}')
-if [ $? != 201 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-
-echo -e "Adding download client ..." | tee -a $log_file
-
-route="$api_root/downloadclient"
-response=$(api_call 'GET' "$route/schema")
-if [ $? != 200 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-readarray -t schemas < <(echo $response | jq -c '.[]')
-for schema in "${schemas[@]}"; do
-  if echo $schema | jq -j '.implementation' | grep -qi 'qbittorrent'; then
-    fields=$(echo $schema | jq -j '.fields')
-    fields=$(echo $fields | jq 'map(select(.name=="host").value="rdtclient")')
-    fields=$(echo $fields | jq 'map(select(.name=="port").value=6500)')
-    fields=$(echo $fields | jq 'map(select(.name=="username").value="'${USERNAME}'")')
-    fields=$(echo $fields | jq 'map(select(.name=="password").value="'${PASSWORD}'")')
-    fields=$(echo $fields | jq 'map(select(.name=="musicCategory").value="lidarr")')
-    payload=$(echo $schema | jq '.enable=true|.name="RDTClient"|.fields='"$fields")
-    response=$(api_call 'POST' "$route?" "$payload")
-    if [ $? != 201 ]; then
-      echo -e "!!! ERROR $?" | tee -a $log_file
-      api_clean
-      return
-    fi
+  api_call 'POST' "$API_ROOT/rootFolder" '{
+    "name": "music",
+    "path": "/music",
+    "defaultMetadataProfileId": 1,
+    "defaultQualityProfileId": 1,
+    "defaultMonitorOption": "all",
+    "defaultNewItemMonitorOption": "all",
+    "defaultTags": [],
+    "accessible": true
+  }'
+  if [ $(api_status) == 201 ]; then
+    return 0
   fi
-done
+  return -1
+}
 
-echo -e "Adding notification ..." | tee -a $log_file
+lidarr_downloadclient () {
+  echo -e "Adding download client ..." | tee -a $log_file
 
-route="$api_root/notification"
-response=$(api_call 'GET' "$route/schema")
-if [ $? != 200 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-provider=$(echo ${NOTIFICATION_URL} | cut -d : -f 1)
-token=$(echo ${NOTIFICATION_URL} | cut -d / -f 3)
-readarray -t schemas < <(echo $response | jq -c '.[]')
-for schema in "${schemas[@]}"; do
-  if echo $schema | jq -j '.implementation' | grep -qi $provider; then
-    fields=$(echo $schema | jq -j '.fields' | jq 'map(select(.name=="apiKey").value="'$token'")')
-    payload=$(echo $schema | jq '.onGrab=true|.onDownloadFailure=true|.onUpgrade=true|.onRename=true|.onReleaseImport=true|.onImportFailure=true|.onTrackRetag=true|.name="Pushbullet"|.fields='"$fields")
-    response=$(api_call 'POST' "$route?" "$payload")
-    if [ $? != 201 ]; then
-      echo -e "!!! ERROR $?" | tee -a $log_file
-      api_clean
-      return
-    fi
+  route="$API_ROOT/downloadclient"
+  api_call 'GET' "$route/schema"
+  if [ $(api_status) == 200 ]; then
+    readarray -t schemas < <(echo $(api_data) | jq -c '.[]')
+    for schema in "${schemas[@]}"; do
+      if echo $schema | jq -j '.implementation' | grep -qi 'qbittorrent'; then
+        fields=$(echo $schema | jq -j '.fields')
+        fields=$(echo $fields | jq 'map(select(.name=="host").value="rdtclient")')
+        fields=$(echo $fields | jq 'map(select(.name=="port").value=6500)')
+        fields=$(echo $fields | jq 'map(select(.name=="username").value="'${USERNAME}'")')
+        fields=$(echo $fields | jq 'map(select(.name=="password").value="'${PASSWORD}'")')
+        fields=$(echo $fields | jq 'map(select(.name=="musicCategory").value="lidarr")')
+        payload=$(echo $schema | jq '.enable=true|.name="RDTClient"|.fields='"$fields")
+        api_call 'POST' "$route?" "$payload"
+        if [ $(api_status) == 201 ]; then
+          return 0
+        fi
+      fi
+    done
   fi
-done
+  return -1
+}
 
-echo -e "Setting up UI ..." | tee -a $log_file
+lidarr_notification () {
+  arr_notification '.onGrab=true|.onDownloadFailure=true|.onUpgrade=true|.onRename=true|.onReleaseImport=true|.onImportFailure=true|.onTrackRetag=true'
+  return $?
+}
 
-route="$api_root/config/ui"
-response=$(api_call 'GET' $route)
-payload=$(echo $response | jq '.firstDayOfWeek=1|.calendarWeekColumnHeader="ddd D/M"|.shortDateFormat="DD MMM YYYY"|.longDateFormat="dddd, D MMMM YYYY"|.timeFormat="HH:mm"')
-response=$(api_call 'PUT' $route "$payload")
-if [ $? != 202 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
+arr_open "lidarr"
+set_env 'LIDARR_API_KEY' "$API_KEY"
+
+lidarr_rootfolder && lidarr_downloadclient && lidarr_notification && arr_ui && arr_credentials && arr_restart && {
+  echo 'Success.' | tee -a $log_file
   api_clean
-  return
-fi
-
-echo -e "Setting up credentials ..." | tee -a $log_file
-
-route="$api_root/config/host"
-response=$(api_call 'GET' $route)
-payload=$(echo $response | jq '.analyticsEnabled=false|.authenticationMethod="forms"|.password="'${PASSWORD}'"|.username="'${USERNAME}'"')
-response=$(api_call 'PUT' $route "$payload")
-if [ $? != 202 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-
-response=$(api_call 'POST' "$api_root/system/restart")
-
-echo 'Success.' | tee -a $log_file
-
+  return 0
+}
+echo -e "!!! ERROR $(api_status)" | tee -a $log_file
 api_clean
+return -1

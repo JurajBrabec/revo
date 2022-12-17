@@ -7,63 +7,69 @@ fi
 
 source ${SCRIPT_DIR}/api.sh
 
+
+jackett_configuration () {
+  echo -e "Modifying configuration ..." | tee -a $log_file
+  local payload=$(echo $(api_data) | jq '.blackholedir="/downloads"|.updatedisabled=true')
+  api_call 'POST' "$api_root/server/config" "$payload"
+  if [ $(api_status) == 200 ]; then
+    return 0
+  fi
+  return -1
+}
+
 add_indexer () {
   echo -e "Adding indexer '$1' ..." | tee -a $log_file
-  response=$(api_call 'GET' '/api/v2.0/indexers/'$1'/config')
-  if [ $? != 200 ]; then
-    echo -e "!!! ERROR $?" | tee -a $log_file
-    return
+  api_call 'GET' "$api_root/indexers/$1/config"
+  if [ $(api_status) == 200 ]; then
+    api_call 'POST' "$api_root/indexers/$1/config" "$(api_data)"
+    if [ $(api_status) == 204 ]; then
+      return 0
+    fi
   fi
-  response=$(api_call 'POST' '/api/v2.0/indexers/'$1'/config' "$response")
-  if [ $? != 204 ]; then
-    echo -e "!!! ERROR $?" | tee -a $log_file
-    return
+  return -1
+}
+
+jackett_indexers () {
+  for indexer in ${JACKETT_INDEXERS}; do
+    add_indexer "$indexer"
+  done
+  return $?
+}
+
+jackett_credentials () {
+  echo -e "Changing admin password ..." | tee -a $log_file
+  api_call 'POST' "$api_root/server/adminpassword" "${PASSWORD}"
+  if [ $(api_status) == 204 ]; then
+    return 0
   fi
+  return -1
 }
 
 api_open "jackett.${DOMAIN}"
+api_root='/api/v2.0'
 
-api_content_type 'application/x-www-form-urlencoded'
 echo -e "Logging in ..." | tee -a $log_file
-response=$(api_call 'POST' '/UI/Dashboard' 'password='${PASSWORD})
-if [ $? != 46 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
+api_call 'GET' '/UI/Login'
+if [ "$(api_cookie)" == "" ]; then
+  api_content_type 'application/x-www-form-urlencoded'
+  api_call 'POST' '/UI/Dashboard' "password=${PASSWORD}"
 fi
-api_content_type 'application/json'
-
-echo -e "Retrieving API key ..." | tee -a $log_file
-response=$(api_call 'GET' '/api/v2.0/server/config')
-if [ $? != 200 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
+if [ "$(api_cookie)" != "" ]; then
+  echo -e "Retrieving API key ..." | tee -a $log_file
+  api_call 'GET' "$api_root/server/config"
+  if [ $(api_status) == 200 ]; then
+    api_content_type 'application/json'
+    api_key=$(echo $(api_data) | jq -j '.api_key')
+    set_env 'JACKETT_API_KEY' "$api_key"
+    jackett_configuration && jackett_indexers && jackett_credentials && {
+      echo 'Success.' | tee -a $log_file
+      api_clean
+      return 0
+    }
+  fi
 fi
-api_key=$(echo $response | jq -j '.api_key')
-set_env 'JACKETT_API_KEY' "$api_key"
-
-echo -e "Modifying configuration ..." | tee -a $log_file
-config=$(echo $response | jq '.blackholedir="/downloads"|.updatedisabled=true')
-response=$(api_call 'POST' '/api/v2.0/server/config' "$config")
-if [ $? != 200 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-
-for indexer in ${JACKETT_INDEXERS}; do
-  add_indexer "$indexer"
-done
-
-echo -e "Changing admin password ..." | tee -a $log_file
-response=$(api_call 'POST' '/api/v2.0/server/adminpassword' '"'${PASSWORD}'"')
-if [ $? != 204 ]; then
-  echo -e "!!! ERROR $?" | tee -a $log_file
-  api_clean
-  return
-fi
-
-echo 'Success.' | tee -a $log_file
-
+echo -e "!!! ERROR $(api_status)" | tee -a $log_file
 api_clean
+return -1
+

@@ -7,8 +7,8 @@
   "scripts": {
     "restore snapshot": "start /b \"Restore\" \"C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage.exe\" snapshot revo restore \"Clean state\" ",
     "start VM": "start /b \"Start VM\" \"C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage.exe\" startvm revo --type headless",
-    "copy install": "scp -r install revo@localhost:~/revo/",
-    "copy test": "scp install/test.sh revo@localhost:~/revo/install",
+    "copy install": "scp -r install revo@revo.home:~/revo/",
+    "copy test": "scp install/test.sh revo@revo.home:~/revo/install",
     "Start Chrome": "p:\\PortableApps\\GoogleChromePortable\\App\\chrome-bin\\chrome --remote-debugging-port=9222 --incognito",
     "Test": "node test/index.js"
   },
