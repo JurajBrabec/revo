@@ -5,4 +5,5 @@ if [ ! -d ${PROJECT_ROOT}/data ]; then
   exit
 fi
 
-mkdir -p ${PROJECT_ROOT}/data/homepage
+mkdir -p ${PROJECT_ROOT}/config/rdtclient
+mkdir -p ${PROJECT_ROOT}/data/rdtclient

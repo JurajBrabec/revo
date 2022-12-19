@@ -108,7 +108,7 @@
           url: http://whisparr:6969
           key: '${WHISPARR_API_KEY}'
     #
-- Download:
+- File Management:
     #jackett
     - Jackett:
         icon: jackett.png
@@ -139,3 +139,10 @@
           url: http://rdtclient:6500
           username: '${USERNAME}'
           password: '${PASSWORD}'
+    #filebrowser
+    - Filebrowser:
+        icon: filebrowser.png
+        href: https://filebrowser.${DOMAIN}
+        description: File Browser
+        server: docker
+        container: filebrowser

@@ -26,7 +26,8 @@ whisparr_notification () {
 arr_open "whisparr"
 set_env 'WHISPARR_API_KEY' "$API_KEY"
 
-whisparr_rootfolder && lidarr_downloadclient && lidarr_notification && arr_ui && arr_credentials && arr_restart && {
+whisparr_rootfolder && lidarr_downloadclient && lidarr_notification && arr_ui && arr_credentials && {
+  arr_restart
   echo 'Success.' | tee -a $log_file
   api_clean
   return 0

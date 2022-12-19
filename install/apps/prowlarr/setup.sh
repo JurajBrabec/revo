@@ -19,6 +19,7 @@ add_jackett_indexer () {
   if [ $(api_status) == 201 ]; then
     return 0
   fi
+  echo -e "!!! ERROR $(api_status)" | tee -a $log_file
   return -1
 }
 
@@ -27,7 +28,7 @@ prowlarr_indexer () {
   if [ $(api_status) == 200 ]; then
     local schema=$(echo $(api_data) | jq '.[] | select(.name=="Generic Torznab")')
     for indexer in ${JACKETT_INDEXERS}; do
-      add_jackett_indexer "$indexer" "$schema" || return -1
+      add_jackett_indexer "$indexer" "$schema"
     done
     return 0
   fi
@@ -78,7 +79,8 @@ prowlarr_notification () {
 arr_open "prowlarr"
 set_env 'PROWLARR_API_KEY' "$API_KEY"
 
-prowlarr_indexer && prowlarr_apps && prowlarr_downloadclient && prowlarr_notification && arr_ui && arr_credentials && arr_restart && {
+prowlarr_indexer && prowlarr_apps && prowlarr_downloadclient && prowlarr_notification && arr_ui && arr_credentials && {
+  arr_restart
   echo 'Success.' | tee -a $log_file
   api_clean
   return 0

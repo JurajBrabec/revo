@@ -61,7 +61,8 @@ lidarr_notification () {
 arr_open "lidarr"
 set_env 'LIDARR_API_KEY' "$API_KEY"
 
-lidarr_rootfolder && lidarr_downloadclient && lidarr_notification && arr_ui && arr_credentials && arr_restart && {
+lidarr_rootfolder && lidarr_downloadclient && lidarr_notification && arr_ui && arr_credentials && {
+  arr_restart
   echo 'Success.' | tee -a $log_file
   api_clean
   return 0

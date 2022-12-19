@@ -39,7 +39,7 @@ jackett_indexers () {
 
 jackett_credentials () {
   echo -e "Changing admin password ..." | tee -a $log_file
-  api_call 'POST' "$api_root/server/adminpassword" "${PASSWORD}"
+  api_call 'POST' "$api_root/server/adminpassword" '"'${PASSWORD}'"'
   if [ $(api_status) == 204 ]; then
     return 0
   fi
@@ -72,4 +72,3 @@ fi
 echo -e "!!! ERROR $(api_status)" | tee -a $log_file
 api_clean
 return -1
-

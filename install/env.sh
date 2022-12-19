@@ -1,5 +1,5 @@
 SERVICES='traefik'
-OPTIONAL_SERVICES='pihole dozzle portainer rdtclient jackett radarr sonarr bazarr lidarr whisparr prowlarr watchtower homepage'
+OPTIONAL_SERVICES='pihole dozzle portainer filebrowser rdtclient jackett radarr sonarr bazarr lidarr whisparr prowlarr watchtower homepage'
 
 ENV_FILE=${SCRIPT_DIR}/.env
 

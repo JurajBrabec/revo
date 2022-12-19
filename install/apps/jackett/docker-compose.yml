@@ -18,5 +18,5 @@ services:
       - default
     restart: always
     volumes:
-      - '${PROJECT_ROOT}/config/jackett:/config/Jackett'
+      - '${PROJECT_ROOT}/config:/config'
       - '${PROJECT_ROOT}/data/downloads:/downloads'

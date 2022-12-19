@@ -26,7 +26,8 @@ sonarr_notification () {
 arr_open "sonarr"
 set_env 'SONARR_API_KEY' "$API_KEY"
 
-sonarr_rootfolder && sonarr_downloadclient && sonarr_notification && arr_ui && arr_credentials && arr_restart && {
+sonarr_rootfolder && sonarr_downloadclient && sonarr_notification && arr_ui && arr_credentials && {
+  arr_restart
   echo 'Success.' | tee -a $log_file
   api_clean
   return 0

@@ -5,4 +5,4 @@ if [ ! -d ${PROJECT_ROOT}/config ]; then
   exit
 fi
 
-mkdir -p ${PROJECT_ROOT}/config/Jackett
+conf=${PROJECT_ROOT}/config/filebrowser

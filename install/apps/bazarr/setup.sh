@@ -107,13 +107,6 @@ bazarr_credentials () {
   return -1
 }
 
-bazarr_restart () {
-  echo -e "Applying configuration ..." | tee -a $log_file
-
-  api_call 'POST' "/api/system?action=restart"
-  return 0
-}
-
 api_open "bazarr.${DOMAIN}"
 
 echo -e "Retrieving API key ..." | tee -a $log_file
@@ -127,7 +120,7 @@ if [ $(api_status) == 200 ]; then
   api_content_type 'multipart/form-data'
   api_root='/api/system/settings'
 
-  bazarr_languages && bazarr_apps && bazarr_providers && bazarr_notifications && bazarr_credentials bazarr_restart && {
+  bazarr_languages && bazarr_apps && bazarr_providers && bazarr_notifications && bazarr_credentials && {
     echo 'Success.' | tee -a $log_file
     api_clean
     return 0

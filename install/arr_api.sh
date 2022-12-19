@@ -132,8 +132,7 @@ arr_credentials () {
 }
 
 arr_restart () {
-  echo -e "Applying configuration ..." | tee -a $log_file
-  api_call 'POST' "$API_ROOT/system/restart"
-
-  return 0
+  echo -e "Restarting ..." | tee -a $log_file
+  api_call 'POST' "$API_ROOT/system/shutdown"
+  return $?
 }

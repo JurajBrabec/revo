@@ -1,0 +1,22 @@
+services:
+  filebrowser:
+    container_name: filebrowser
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+      - FB_PASSWORD=${HASH}
+    expose:
+      - 80
+    image: filebrowser/filebrowser:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.filebrowser.rule=Host(`filebrowser.${DOMAIN}`)'
+      - 'traefik.http.routers.filebrowser.tls=true'
+    networks:
+      - default
+    restart: always
+    volumes:
+      - '${PROJECT_ROOT}/data/downloads:/srv/downloads'
+      - '${PROJECT_ROOT}/data/share:/srv/share'

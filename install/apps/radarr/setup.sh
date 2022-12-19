@@ -26,7 +26,8 @@ radarr_notification () {
 arr_open "radarr"
 set_env 'RADARR_API_KEY' "$API_KEY"
 
-radarr_rootfolder && radarr_downloadclient && radarr_notification && arr_ui && arr_credentials && arr_restart && {
+radarr_rootfolder && radarr_downloadclient && radarr_notification && arr_ui && arr_credentials && {
+  arr_restart
   echo 'Success.' | tee -a $log_file
   api_clean
   return 0

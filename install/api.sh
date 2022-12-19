@@ -34,6 +34,9 @@ api_clean () {
 api_content_type () {
   API_CONTENT_TYPE=$1
 }
+api_debug () {
+  API_DEBUG=$1
+}
 api_token () {
   API_TOKEN=$1
   echo "$1">$API_T_FILE
@@ -62,7 +65,7 @@ api_call () {
       done
     elif [ $API_CONTENT_TYPE == 'multipart/form-data' ]; then
       for item in $(cat $API_P_FILE); do
-        local command="$command -F '$item'"
+        local command="$command -F $item"
       done
     fi
   fi
@@ -111,9 +114,6 @@ api_cookie () {
 }
 api_data () {
   cat $API_D_FILE
-}
-api_debug () {
-  $API_DEBUG=$1
 }
 api_error () {
   echo $API_ERROR

@@ -21,6 +21,7 @@ services:
       - default
     restart: always
     volumes:
+      - '${PROJECT_ROOT}/config/rdtclient:/config'
       - '${PROJECT_ROOT}/data/rdtclient:/data/db'
       - '${PROJECT_ROOT}/data/downloads:/data/downloads'
       - '${PROJECT_ROOT}/data/tmp:/data/tmp'

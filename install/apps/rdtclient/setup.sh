@@ -55,7 +55,7 @@ rdtclient_login () {
 
 rdtclient_config () {
   echo -e "Modifying configuration ..." | tee -a $log_file
-  api_call 'PUT' '/Api/Settings' '[{"key": "DownloadClient:MappedPath","value": "/downloads","type": "String"}]'
+  api_call 'PUT' '/Api/Settings' '[{"key": "General:DownloadLimit","value": 5,"type": "Int32"},{"key": "DownloadClient:MappedPath","value": "/downloads","type": "String"},{"key": "Watch:Path","value": "/data/downloads","type": "String"}]'
   if [ $(api_status) == 200 ]; then
     return 0
   fi
@@ -63,6 +63,7 @@ rdtclient_config () {
 }
 
 rdtclient_setup && rdtclient_login && rdtclient_config && {
+  docker restart portainer > /dev/null
   echo 'Success.' | tee -a $log_file
   api_clean
   return 0
