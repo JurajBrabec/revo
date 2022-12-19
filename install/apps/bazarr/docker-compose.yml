@@ -18,4 +18,5 @@ services:
     restart: always
     volumes:
       - '${PROJECT_ROOT}/config/bazarr:/config'
-      - '${PROJECT_ROOT}/data/downloads:/downloads'
+      - '${PROJECT_ROOT}/data/share/movies:/movies'
+      - '${PROJECT_ROOT}/data/share/tv:/tv'
