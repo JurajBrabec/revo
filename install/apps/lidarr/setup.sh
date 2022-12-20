@@ -58,10 +58,22 @@ lidarr_notification () {
   return $?
 }
 
+lidarr_naming () {
+  route="$API_ROOT/config/naming"
+  api_call 'GET' "$route"
+  if [ $(api_status) == 200 ]; then
+    api_call 'PUT' "$route" "$(echo $(api_data) | jq -c '.renameTracks=true')"
+    if [ $(api_status) == 202 ]; then
+      return 0
+    fi
+  fi
+  return -1
+}
+
 arr_open "lidarr"
 set_env 'LIDARR_API_KEY' "$API_KEY"
 
-lidarr_rootfolder && lidarr_downloadclient && lidarr_notification && arr_ui && arr_credentials && {
+lidarr_rootfolder && lidarr_downloadclient && lidarr_notification && lidarr_naming && arr_ui && arr_credentials && {
   arr_restart
   echo 'Success.' | tee -a $log_file
   api_clean
