@@ -3,6 +3,18 @@
 # https://gethomepage.dev/en/configs/services/
 
 - System:
+    #adguardhome
+    - AdGuard Home:
+        icon: adguard-home.png
+        href: https://adguardhome.{DOMAIN}/
+        description: AdGuard Home
+        server: docker
+        container: adguardhome
+        widget:
+          type: adguard
+          url: https://adguardhome.${DOMAIN}
+          username: '${USERNAME}'
+          password: '${PASSWORD}'
     #pihole
     - Pi Hole:
         icon: pihole.png

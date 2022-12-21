@@ -17,6 +17,6 @@ services:
       - default
     restart: always
     volumes:
-      - '${PROJECT_ROOT}/config/bazarr:/config'
-      - '${PROJECT_ROOT}/data/share/movies:/movies'
-      - '${PROJECT_ROOT}/data/share/tv:/tv'
+      - '${INSTALL_DIR}/config/bazarr:/config'
+      - '${INSTALL_DIR}/data/share/movies:/movies'
+      - '${INSTALL_DIR}/data/share/tv:/tv'

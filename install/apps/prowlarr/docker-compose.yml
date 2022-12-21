@@ -17,4 +17,4 @@ services:
       - default
     restart: always
     volumes:
-      - '${PROJECT_ROOT}/config/prowlarr:/config'
+      - '${INSTALL_DIR}/config/prowlarr:/config'

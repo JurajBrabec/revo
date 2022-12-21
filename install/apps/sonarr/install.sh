@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ ! -d ${PROJECT_ROOT}/config ]; then
+if [ ! -d ${INSTALL_DIR}/config ]; then
   echo -e "\nRun setup.sh." | tee -a $log_file
   exit
 fi
 
-mkdir -p ${PROJECT_ROOT}/config/sonarr
-mkdir -p ${PROJECT_ROOT}/data/downloads/sonarr
-mkdir -p ${PROJECT_ROOT}/data/share/tv
+mkdir -p ${INSTALL_DIR}/config/sonarr
+mkdir -p ${DOWNLOADS_DIR}/sonarr
+mkdir -p ${SHARE_DIR}/tv

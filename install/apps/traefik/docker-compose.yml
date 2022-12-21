@@ -26,5 +26,5 @@ services:
       - 443:443
     restart: always
     volumes:
-      - '${PROJECT_ROOT}/config/traefik:/etc/traefik'
+      - '${INSTALL_DIR}/config/traefik:/etc/traefik'
       - '${DOCKER_SOCKET}:/var/run/docker.sock:ro'

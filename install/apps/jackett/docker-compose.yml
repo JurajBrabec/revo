@@ -18,5 +18,5 @@ services:
       - default
     restart: always
     volumes:
-      - '${PROJECT_ROOT}/config:/config'
-      - '${PROJECT_ROOT}/data/downloads:/downloads'
+      - '${INSTALL_DIR}/config:/config'
+      - '${DOWNLOADS_DIR}:/downloads'

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ ! -d ${PROJECT_ROOT}/config ]; then
+if [ ! -d ${INSTALL_DIR}/config ]; then
   echo -e "\nRun setup.sh." | tee -a $log_file
   exit
 fi
 
-conf=${PROJECT_ROOT}/config/filebrowser
+conf=${INSTALL_DIR}/config/filebrowser

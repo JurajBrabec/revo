@@ -17,6 +17,6 @@ services:
       - default
     restart: always
     volumes:
-      - '${PROJECT_ROOT}/config/whisparr:/config'
-      - '${PROJECT_ROOT}/data/downloads:/downloads'
-      - '${PROJECT_ROOT}/data/share/xxx:/xxx'
+      - '${INSTALL_DIR}/config/whisparr:/config'
+      - '${DOWNLOADS_DIR}:/downloads'
+      - '${SHARE_DIR}/xxx:/xxx'

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [ ! -d ${PROJECT_ROOT}/config ]; then
+if [ ! -d ${INSTALL_DIR}/config ]; then
   echo -e "\nRun setup.sh." | tee -a $log_file
   exit
 fi
 
-conf=${PROJECT_ROOT}/config/traefik
+conf=${INSTALL_DIR}/config/traefik
 
 mkdir -p $conf/certs
 cp -rf ./config/* $conf

@@ -14,13 +14,13 @@ source ${SCRIPT_DIR}/env.sh
 
 echo -e "\nService Setup\n" | tee $log_file
 
-mkdir -p ${PROJECT_ROOT}/config
-mkdir -p ${PROJECT_ROOT}/data/downloads
-mkdir -p ${PROJECT_ROOT}/data/tmp
+mkdir -p ${INSTALL_DIR}/config
+mkdir -p ${DOWNLOADS_DIR}
+mkdir -p ${INSTALL_DIR}/data/tmp
 
 #create-docker-compose
 
-docker_compose=${PROJECT_ROOT}/docker-compose.yml
+docker_compose=${INSTALL_DIR}/docker-compose.yml
 
 cat > $docker_compose << EOF
 name: ${PROJECT_NAME}
@@ -29,7 +29,7 @@ EOF
 
 for service in ${SERVICES}; do
   echo -e "Installing service '$service' ..." | tee -a $log_file
-  cd ${PROJECT_ROOT}/install/apps/$service && source install.sh
+  cd ${INSTALL_DIR}/install/apps/$service && source install.sh
   docker compose --env-file $ENV_FILE convert | grep "^services:" -A 999 | grep "networks:" -B 999 | grep -Ev "^(networks|services):" >> $docker_compose
 done
 
@@ -40,7 +40,7 @@ networks:
     name: ${DOCKER_NETWORK}
 EOF
 
-cd ${PROJECT_ROOT}
+cd ${INSTALL_DIR}
 
 #start-docker
 
@@ -61,13 +61,13 @@ fi
 echo -e "\nSetting up services ..." | tee -a $log_file
 
 for service in ${SERVICES}; do
-  if [ -f ${PROJECT_ROOT}/install/apps/$service/setup.sh ]; then
+  if [ -f ${INSTALL_DIR}/install/apps/$service/setup.sh ]; then
     echo -e "\nSetting up service '$service' ..." | tee -a $log_file
-    cd ${PROJECT_ROOT}/install/apps/$service && source setup.sh
+    cd ${INSTALL_DIR}/install/apps/$service && source setup.sh
   fi
 done
 
-cd ${PROJECT_ROOT}
+cd ${INSTALL_DIR}
 
 echo -e "\nDone." | tee -a $log_file
 echo -e "\nOpen https://homepage.${DOMAIN} page.\n" | tee -a $log_file

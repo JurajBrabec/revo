@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [ ! -d ${PROJECT_ROOT}/config ]; then
+if [ ! -d ${INSTALL_DIR}/config ]; then
   echo -e "\nRun setup.sh." | tee -a $log_file
   exit
 fi
 
-conf=${PROJECT_ROOT}/config/pihole
+conf=${INSTALL_DIR}/config/pihole
 
 mkdir -p $conf
 cp -rf ./config/* $conf

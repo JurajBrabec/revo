@@ -1,0 +1,27 @@
+services:
+  adguardhome:
+    container_name: adguardhome
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    expose:
+      - 80
+    hostname: adguardhome
+    image: adguard/adguardhome:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.adguardhome.rule=Host(`adguardhome.${DOMAIN}`)'
+      - 'traefik.http.routers.adguardhome.service=adguardhome'
+      - 'traefik.http.routers.adguardhome.tls=true'
+      - 'traefik.http.services.adguardhome.loadbalancer.server.port=80'
+    networks:
+      - default
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+    restart: always
+    volumes:
+      - '${INSTALL_DIR}/config/adguardhome:/opt/adguardhome/conf'
+      - '${INSTALL_DIR}/data/adguardhome:/opt/adguardhome/work'

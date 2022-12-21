@@ -8,7 +8,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
       - UMASK=${UMASK}
-      - PIHOLE_DNS1=${PIHOLE_DNS1}
+      - PIHOLE_DNS1=${UPSTREAM_DNS}
       - DNSMASQ_LISTENING=local
       - WEBPASSWORD=${PASSWORD}
     expose:
@@ -33,5 +33,5 @@ services:
       - 67:67/udp
     restart: always
     volumes:
-      - '${PROJECT_ROOT}/config/pihole/dnsmasq.d:/etc/dnsmasq.d'
-      - '${PROJECT_ROOT}/config/pihole/pihole:/etc/pihole'
+      - '${INSTALL_DIR}/config/pihole/dnsmasq.d:/etc/dnsmasq.d'
+      - '${INSTALL_DIR}/config/pihole/pihole:/etc/pihole'

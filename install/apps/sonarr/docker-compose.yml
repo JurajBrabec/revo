@@ -17,6 +17,6 @@ services:
       - default
     restart: always
     volumes:
-      - '${PROJECT_ROOT}/config/sonarr:/config'
-      - '${PROJECT_ROOT}/data/downloads:/downloads'
-      - '${PROJECT_ROOT}/data/share/tv:/tv'
+      - '${INSTALL_DIR}/config/sonarr:/config'
+      - '${DOWNLOADS_DIR}:/downloads'
+      - '${SHARE_DIR}/tv:/tv'

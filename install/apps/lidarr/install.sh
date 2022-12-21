@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ ! -d ${PROJECT_ROOT}/config ]; then
+if [ ! -d ${INSTALL_DIR}/config ]; then
   echo -e "\nRun setup.sh." | tee -a $log_file
   exit
 fi
 
-mkdir -p ${PROJECT_ROOT}/config/lidarr
-mkdir -p ${PROJECT_ROOT}/data/downloads/lidarr
-mkdir -p ${PROJECT_ROOT}/data/share/music
+mkdir -p ${INSTALL_DIR}/config/lidarr
+mkdir -p ${DOWNLOADS_DIR}/lidarr
+mkdir -p ${SHARE_DIR}/music

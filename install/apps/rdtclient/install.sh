@@ -1,9 +1,9 @@
 #!/bin/bash
 
-if [ ! -d ${PROJECT_ROOT}/data ]; then
+if [ ! -d ${INSTALL_DIR}/data ]; then
   echo -e "\nRun setup.sh." | tee -a $log_file
   exit
 fi
 
-mkdir -p ${PROJECT_ROOT}/config/rdtclient
-mkdir -p ${PROJECT_ROOT}/data/rdtclient
+mkdir -p ${INSTALL_DIR}/config/rdtclient
+mkdir -p ${INSTALL_DIR}/data/rdtclient

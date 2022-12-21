@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ ! -d ${PROJECT_ROOT}/config ]; then
+if [ ! -d ${INSTALL_DIR}/config ]; then
   echo -e "\nRun setup.sh." | tee -a $log_file
   exit
 fi
 
-mkdir -p ${PROJECT_ROOT}/config/whisparr
-mkdir -p ${PROJECT_ROOT}/data/downloads/whisparr
-mkdir -p ${PROJECT_ROOT}/data/share/xxx
+mkdir -p ${INSTALL_DIR}/config/whisparr
+mkdir -p ${DOWNLOADS_DIR}/whisparr
+mkdir -p ${SHARE_DIR}/xxx

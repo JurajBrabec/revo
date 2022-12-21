@@ -17,6 +17,6 @@ services:
       - default
     restart: always
     volumes:
-      - '${PROJECT_ROOT}/config/radarr:/config'
-      - '${PROJECT_ROOT}/data/downloads:/downloads'
-      - '${PROJECT_ROOT}/data/share/movies:/movies'
+      - '${INSTALL_DIR}/config/radarr:/config'
+      - '${DOWNLOADS_DIR}:/downloads'
+      - '${SHARE_DIR}/movies:/movies'
